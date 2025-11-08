@@ -146,7 +146,7 @@ p {
 
 /* Header - Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('images/camara-fria-hero.webp') no-repeat center center/cover;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('camara-fria-hero.webp') no-repeat center center/cover;
     color: var(--text-light);
     /* Removido padding-top/bottom para deixar o align-items: center fazer o trabalho */
     min-height: 85vh; /* Altura aumentada para maior impacto visual */
