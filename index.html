@@ -58,7 +58,7 @@
         <span class="title-line-3">para o Seu Negócio</span>
     </h1>
     <p class="hero-subtitle">Tecnologia de ponta e expertise para garantir a conservação ideal dos seus produtos.</p>
-    <a href="#contato" 
+    <a href="form.html" 
        class="btn-primary modern-btn"
        onclick="
            gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Button'});
@@ -107,7 +107,7 @@
                 </div>
                 <div class="cta-aplicacoes">
                     <p>Sua necessidade não está aqui? Fale conosco e desenvolvemos a solução ideal!</p>
-                    <a href="#contato" 
+                    <a href="form.html" 
                        class="btn-secondary"
                        onclick="
                            gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Specialist Button'});
@@ -222,8 +222,7 @@
                         <h3>Fale Conosco no WhatsApp</h3>
                         <p>Atendimento rápido e personalizado para suas necessidades de refrigeração</p>
                     </div>
-                    <a href="https://wa.me/5554992619111?text=Olá! Gostaria de solicitar um orçamento para câmaras frias." 
-                       target="_blank" 
+                    <a href="form.html" 
                        class="btn-whatsapp"
                        onclick="
                            gtag('event', 'conversion', {'send_to': 'AW-XXXXXXXXX/XXXXX'});
@@ -261,14 +260,15 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 RRD Câmaras Frias. Todos os direitos reservados.</p>
+                <p>&copy; 2025 RRD Câmaras Frias. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
     <!-- Botão Flutuante do WhatsApp -->
     <div class="whatsapp-float">
-        <a href="https://wa.me/5554992619111?text=Olá! Gostaria de mais informações sobre câmaras frias." 
+        <a id="whatsapp-float-btn" 
+           href="javascript:void(0)"
            target="_blank" 
            class="whatsapp-float-btn"
            onclick="
@@ -304,12 +304,12 @@
     <!-- ========================================== -->
     <!-- GOOGLE ANALYTICS 4 - SUBSTITUA O ID AQUI -->
     <!-- ========================================== -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S6CED5Q2X1"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-XXXXXXXXXX'); // SUBSTITUA AQUI
+        gtag('config', 'G-S6CED5Q2X1'); // SUBSTITUA AQUI
     </script>
     <!-- ========================================== -->
     
@@ -356,10 +356,59 @@
             });
             dataLayer.push({'event': 'time_on_page_30s'});
         }, 30000);
+
+        // ========================================== 
+        // SCRIPT PARA INJETAR UTMs NO WHATSAPP
+        // ========================================== 
+        function getUTMParameters() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                utm_source: params.get('utm_source') || '',
+                utm_medium: params.get('utm_medium') || '',
+                utm_campaign: params.get('utm_campaign') || '',
+                utm_content: params.get('utm_content') || '',
+                utm_term: params.get('utm_term') || ''
+            };
+        }
+
+        function buildWhatsAppURL() {
+            const phoneNumber = '5554992619111'; // Número sem máscara
+            const baseMessage = 'Olá! Gostaria de mais informações sobre câmaras frias.';
+            const utms = getUTMParameters();
+            
+            // Construir mensagem com UTMs
+            let message = baseMessage;
+            if (utms.utm_source || utms.utm_medium || utms.utm_campaign) {
+                message += '\n\nOrigem da campanha:';
+                if (utms.utm_source) message += `\nFonte: ${utms.utm_source}`;
+                if (utms.utm_medium) message += `\nMeio: ${utms.utm_medium}`;
+                if (utms.utm_campaign) message += `\nCampanha: ${utms.utm_campaign}`;
+                if (utms.utm_content) message += `\nConteúdo: ${utms.utm_content}`;
+                if (utms.utm_term) message += `\nTermo: ${utms.utm_term}`;
+            }
+            
+            return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        }
+
+        // Aplicar URL dinâmica aos botões WhatsApp
+        function initWhatsAppButtons() {
+            const whatsappButtons = document.querySelectorAll('[id*="whatsapp"]');
+            const whatsappUrl = buildWhatsAppURL();
+            
+            whatsappButtons.forEach(btn => {
+                btn.href = whatsappUrl;
+            });
+        }
+
+        // Executar quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhatsAppButtons);
+        } else {
+            initWhatsAppButtons();
+        }
     </script>
     <!-- ========================================== -->
     
     <script src="comportamento.js"></script>
 </body>
-
 </html>
