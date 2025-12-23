@@ -74,10 +74,7 @@
     <a id="whatsapp-hero-btn" 
        href="javascript:void(0)"
        class="btn-primary modern-btn"
-       onclick="
-           gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Hero Button'});
-           dataLayer.push({'event': 'cta_click_hero'});
-       ">Solicite um Orçamento Grátis</a>
+       onclick="buildWhatsAppURL();">Solicite um Orçamento Grátis</a>
 </div>
         </div>
     </header>
@@ -124,10 +121,7 @@
                     <a id="whatsapp-specialist-btn" 
                        href="javascript:void(0)"
                        class="btn-secondary"
-                       onclick="
-                           gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Specialist Button'});
-                           dataLayer.push({'event': 'cta_click_specialist'});
-                       ">Fale com um Especialista</a>
+                       onclick="buildWhatsAppURL();">Fale com um Especialista</a>
                 </div>
             </div>
         </section>
@@ -240,11 +234,7 @@
                     <a id="whatsapp-main-btn" 
                        href="javascript:void(0)"
                        class="btn-whatsapp"
-                       onclick="
-                           gtag('event', 'conversion', {'send_to': 'AW-10906800043'});
-                           fbq('track', 'Lead');
-                           dataLayer.push({'event': 'whatsapp_click_main'});
-                       ">
+                       onclick="buildWhatsAppURL();">
                         <i class="fab fa-whatsapp"></i>
                         Solicitar Orçamento via WhatsApp
                     </a>
