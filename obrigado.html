@@ -130,47 +130,8 @@
     </div>
 
     <script>
-        // ========================================== 
-        // REDIRECIONAMENTO SIMPLES E RÁPIDO
-        // ========================================== 
-
-        // Configuração do WhatsApp
-        const WHATSAPP_NUMBER = "5554992619111";
-        const WHATSAPP_MESSAGE = "Olá! Gostaria de mais informações sobre câmaras frias.";
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
-
-        // Redirecionar imediatamente após 600ms (tempo para GA4 disparar)
-        setTimeout(() => {
-            window.location.href = whatsappUrl;
-        }, 600);
-
-        // Dispara eventos GA4 de forma assíncrona (não bloqueia redirecionamento)
-        if (window.gtag && typeof window.gtag === 'function') {
-            // Evento de conversão
-            gtag('event', 'conversion', {
-                'value': 0,
-                'currency': 'BRL',
-                'transaction_id': 'whatsapp_redirect_' + Date.now()
-            });
-
-            // Evento customizado
-            gtag('event', 'whatsapp_redirect', {
-                'event_category': 'engagement',
-                'event_label': 'lead_to_whatsapp',
-                'value': 1
-            });
-
-            // Evento de purchase
-            gtag('event', 'purchase', {
-                'value': 0,
-                'currency': 'BRL',
-                'items': [{
-                    'item_id': 'whatsapp_lead',
-                    'item_name': 'WhatsApp Lead - RRD Câmaras Frias',
-                    'quantity': 1
-                }]
-            });
-        }
+        // Redirecionamento imediato para WhatsApp
+        window.location.href = 'https://api.whatsapp.com/send?phone=5554992619111&text=Ol%C3%A1%21%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20c%C3%A2maras%20frias.';
     </script>
 </body>
 </html>
