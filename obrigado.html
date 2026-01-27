@@ -131,186 +131,45 @@
 
     <script>
         // ========================================== 
-        // FUNÇÕES DE UTILIDADE
+        // REDIRECIONAMENTO SIMPLES E RÁPIDO
         // ========================================== 
 
-        /**
-         * Captura os parâmetros UTM da URL
-         * @returns {Object} Objeto com os parâmetros UTM
-         */
-        function getUTMParameters() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                utm_source: params.get('utm_source') || '',
-                utm_medium: params.get('utm_medium') || '',
-                utm_campaign: params.get('utm_campaign') || '',
-                utm_content: params.get('utm_content') || '',
-                utm_term: params.get('utm_term') || ''
-            };
-        }
-
-        /**
-         * Aguarda que o GA4 esteja disponível no dataLayer (máximo 500ms)
-         * @param {number} timeout - Tempo máximo de espera em ms
-         * @returns {Promise}
-         */
-        function waitForGA4(timeout = 500) {
-            return new Promise((resolve) => {
-                if (window.gtag && typeof window.gtag === 'function') {
-                    resolve();
-                } else {
-                    const startTime = Date.now();
-                    const checkInterval = setInterval(() => {
-                        if (window.gtag && typeof window.gtag === 'function') {
-                            clearInterval(checkInterval);
-                            resolve();
-                        } else if (Date.now() - startTime > timeout) {
-                            clearInterval(checkInterval);
-                            resolve(); // Resolve mesmo que GA4 não esteja disponível
-                        }
-                    }, 50);
-                }
-            });
-        }
-
-        /**
-         * Dispara o evento de conversão no Google Ads
-         * Este é o evento mais importante para rastreamento
-         */
-        function fireConversionEvent() {
-            if (window.gtag && typeof window.gtag === 'function') {
-                try {
-                    gtag('event', 'conversion', {
-                        'value': 0,
-                        'currency': 'BRL',
-                        'transaction_id': 'whatsapp_redirect_' + Date.now()
-                    });
-                    console.log('✓ Evento de conversão disparado com sucesso');
-                } catch (error) {
-                    console.warn('Erro ao disparar evento de conversão:', error);
-                }
-            }
-        }
-
-        /**
-         * Dispara evento customizado no GA4
-         */
-        function fireCustomEvent() {
-            if (window.gtag && typeof window.gtag === 'function') {
-                try {
-                    gtag('event', 'whatsapp_redirect', {
-                        'event_category': 'engagement',
-                        'event_label': 'lead_to_whatsapp',
-                        'value': 1
-                    });
-                    console.log('✓ Evento customizado disparado com sucesso');
-                } catch (error) {
-                    console.warn('Erro ao disparar evento customizado:', error);
-                }
-            }
-        }
-
-        /**
-         * Envia evento de purchase para o Google Ads (opcional)
-         */
-        function firePurchaseEvent(utmParams) {
-            if (window.gtag && typeof window.gtag === 'function') {
-                try {
-                    gtag('event', 'purchase', {
-                        'value': 0,
-                        'currency': 'BRL',
-                        'items': [{
-                            'item_id': 'whatsapp_lead',
-                            'item_name': 'WhatsApp Lead - RRD Câmaras Frias',
-                            'quantity': 1
-                        }],
-                        'utm_source': utmParams.utm_source,
-                        'utm_medium': utmParams.utm_medium,
-                        'utm_campaign': utmParams.utm_campaign
-                    });
-                    console.log('✓ Evento de purchase disparado com sucesso');
-                } catch (error) {
-                    console.warn('Erro ao disparar evento de purchase:', error);
-                }
-            }
-        }
-
-        /**
-         * Inicializa o contador regressivo na tela
-         */
-        function initializeCountdown() {
-            let seconds = 1;
-            const countdownElement = document.getElementById('countdown');
-            
-            const countdownInterval = setInterval(() => {
-                seconds--;
-                if (countdownElement) {
-                    countdownElement.textContent = seconds;
-                }
-                
-                if (seconds <= 0) {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
-        }
-
-        // ========================================== 
-        // LÓGICA PRINCIPAL
-        // ========================================== 
-
-        // Configuração do URL de redirecionamento para WhatsApp
+        // Configuração do WhatsApp
         const WHATSAPP_NUMBER = "5554992619111";
         const WHATSAPP_MESSAGE = "Olá! Gostaria de mais informações sobre câmaras frias.";
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
-        // Capturar UTMs da URL atual
-        const utmParams = getUTMParameters();
-        console.log('📍 Parâmetros UTM capturados:', utmParams);
+        // Redirecionar imediatamente após 600ms (tempo para GA4 disparar)
+        setTimeout(() => {
+            window.location.href = whatsappUrl;
+        }, 600);
 
-        // Armazenar UTMs no sessionStorage para rastreamento futura
-        sessionStorage.setItem('lastUTMParams', JSON.stringify(utmParams));
+        // Dispara eventos GA4 de forma assíncrona (não bloqueia redirecionamento)
+        if (window.gtag && typeof window.gtag === 'function') {
+            // Evento de conversão
+            gtag('event', 'conversion', {
+                'value': 0,
+                'currency': 'BRL',
+                'transaction_id': 'whatsapp_redirect_' + Date.now()
+            });
 
-        /**
-         * Função principal de redirecionamento
-         * Aguarda o GA4 disparar e depois redireciona
-         */
-        async function handleTransition() {
-            try {
-                console.log('🚀 Iniciando redirecionamento com rastreamento...');
-                
-                // Inicializa contador regressivo
-                initializeCountdown();
+            // Evento customizado
+            gtag('event', 'whatsapp_redirect', {
+                'event_category': 'engagement',
+                'event_label': 'lead_to_whatsapp',
+                'value': 1
+            });
 
-                // Aguarda GA4 estar disponível (máximo 500ms)
-                console.log('⏳ Aguardando GA4...');
-                await waitForGA4(500);
-
-                // Dispara eventos de rastreamento
-                console.log('📊 Disparando eventos de rastreamento...');
-                fireConversionEvent();
-                fireCustomEvent();
-                firePurchaseEvent(utmParams);
-
-                // Aguarda tempo mínimo para GA4 processar (reduzido para 600ms)
-                console.log('⏱️ Aguardando processamento de eventos (600ms)...');
-                await new Promise(resolve => setTimeout(resolve, 600));
-
-                // Redireciona para WhatsApp
-                console.log('↗️ Redirecionando para WhatsApp...');
-                window.location.href = whatsappUrl;
-
-            } catch (error) {
-                console.error('Erro durante transição:', error);
-                // Fallback: redireciona imediatamente
-                window.location.href = whatsappUrl;
-            }
-        }
-
-        // Inicia o redirecionamento quando a página carrega
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', handleTransition);
-        } else {
-            handleTransition();
+            // Evento de purchase
+            gtag('event', 'purchase', {
+                'value': 0,
+                'currency': 'BRL',
+                'items': [{
+                    'item_id': 'whatsapp_lead',
+                    'item_name': 'WhatsApp Lead - RRD Câmaras Frias',
+                    'quantity': 1
+                }]
+            });
         }
     </script>
 </body>
