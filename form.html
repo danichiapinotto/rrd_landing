@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Orçamento - RRD Câmaras Frias</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .form-wrapper {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .form-wrapper h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .form-wrapper p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .form-group.checkbox {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .form-group.checkbox input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .form-group.checkbox label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group.error input {
+            border-color: #e74c3c;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .form-wrapper {
+                padding: 25px;
+            }
+
+            .form-wrapper h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-wrapper">
+            <h1>Solicite seu Orçamento</h1>
+            <p>Preencha os dados abaixo e fale conosco pelo WhatsApp</p>
+
+            <form id="leadForm">
+                <div class="form-group">
+                    <label for="name">Nome Completo *</label>
+                    <input type="text" id="name" name="name" placeholder="Seu nome" required>
+                    <div class="error-message">Por favor, preencha seu nome</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp *</label>
+                    <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" required>
+                    <div class="error-message">Por favor, preencha um WhatsApp válido</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail (opcional)</label>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">Concordo em receber mensagens no WhatsApp</label>
+                </div>
+
+                <div class="loading" id="loading">
+                    <p>Processando... Você será redirecionado em breve.</p>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Falar no WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Capturar UTMs da URL
+        function getUTMParameters() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                utm_source: params.get('utm_source') || '',
+                utm_medium: params.get('utm_medium') || '',
+                utm_campaign: params.get('utm_campaign') || '',
+                utm_content: params.get('utm_content') || '',
+                utm_term: params.get('utm_term') || ''
+            };
+        }
+
+        // Validar WhatsApp
+        function validateWhatsApp(phone) {
+            // Remove caracteres não numéricos
+            const cleanPhone = phone.replace(/\D/g, '');
+            // Verifica se tem entre 10 e 11 dígitos
+            return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+        }
+
+        // Formatar WhatsApp para envio (remover caracteres especiais)
+        function formatWhatsApp(phone) {
+            return phone.replace(/\D/g, '');
+        }
+
+        // Enviar dados para Google Sheets via Apps Script
+        async function sendToGoogleSheets(data) {
+            try {
+                const response = await fetch('https://script.google.com/macros/d/YOUR_APPS_SCRIPT_ID/usercf', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                return response.ok;
+            } catch (error) {
+                console.error('Erro ao enviar para Google Sheets:', error);
+                return false;
+            }
+        }
+
+        // Tratamento do formulário
+        document.getElementById('leadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const terms = document.getElementById('terms').checked;
+
+            // Validar nome
+            if (name.length < 3) {
+                showError('name', 'Digite um nome válido');
+                return;
+            }
+
+            // Validar WhatsApp
+            if (!validateWhatsApp(whatsapp)) {
+                showError('whatsapp', 'Digite um WhatsApp válido com DDD');
+                return;
+            }
+
+            // Validar termos
+            if (!terms) {
+                showError('terms', 'Você deve concordar com os termos');
+                return;
+            }
+
+            // Limpar erros
+            document.querySelectorAll('.form-group').forEach(group => group.classList.remove('error'));
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('submitBtn').disabled = true;
+
+            // Capturar UTMs
+            const utmParams = getUTMParameters();
+
+            // Preparar dados para envio
+            const leadData = {
+                name: name,
+                whatsapp: whatsapp,
+                email: email,
+                timestamp: new Date().toISOString(),
+                utm_source: utmParams.utm_source,
+                utm_medium: utmParams.utm_medium,
+                utm_campaign: utmParams.utm_campaign,
+                utm_content: utmParams.utm_content,
+                utm_term: utmParams.utm_term
+            };
+
+            // Enviar para Google Sheets
+            await sendToGoogleSheets(leadData);
+
+            // Armazenar dados na sessão para a página de obrigado
+            sessionStorage.setItem('leadData', JSON.stringify(leadData));
+
+            // Construir URL de redirecionamento para obrigado.html (página de transição) com UTMs
+            let transitionUrl = 'obrigado.html';
+            const urlParams = new URLSearchParams();
+            
+            if (utmParams.utm_source) urlParams.append('utm_source', utmParams.utm_source);
+            if (utmParams.utm_medium) urlParams.append('utm_medium', utmParams.utm_medium);
+            if (utmParams.utm_campaign) urlParams.append('utm_campaign', utmParams.utm_campaign);
+            if (utmParams.utm_content) urlParams.append('utm_content', utmParams.utm_content);
+            if (utmParams.utm_term) urlParams.append('utm_term', utmParams.utm_term);
+            
+            if (urlParams.toString()) {
+                transitionUrl += '?' + urlParams.toString();
+            }
+            
+            // Redirecionar para página de transição (obrigado.html que dispara GA4 e redireciona para WhatsApp)
+            window.location.href = transitionUrl;
+        });
+
+        // Função para mostrar erro
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                const group = field.closest('.form-group');
+                if (group) {
+                    group.classList.add('error');
+                    const errorMsg = group.querySelector('.error-message');
+                    if (errorMsg) {
+                        errorMsg.textContent = message;
+                    }
+                }
+            }
+        }
+
+        // Remover erro ao digitar
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                const group = this.closest('.form-group');
+                if (group) {
+                    group.classList.remove('error');
+                }
+            });
+        });
+
+        // Pré-preencher UTMs se disponíveis
+        window.addEventListener('load', function() {
+            const utmParams = getUTMParameters();
+            console.log('UTMs detectadas:', utmParams);
+        });
+    </script>
+</body>
+</html>
