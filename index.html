@@ -25,7 +25,6 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; img-src 'self' data: https:; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com https://region1.analytics.google.com; frame-src 'self' https://www.googletagmanager.com;">
     <title>RRD Câmaras Frias - Soluções Completas em Refrigeração</title>
     
     <!-- CSS Otimizado para Performance -->
@@ -74,7 +73,7 @@
     <a id="whatsapp-hero-btn" 
        href="javascript:void(0)"
        class="btn-primary modern-btn"
-       onclick="buildWhatsAppURL();">Solicite um Orçamento Grátis</a>
+       onclick="goToTransition();">Solicite um Orçamento Grátis</a>
 </div>
         </div>
     </header>
@@ -121,7 +120,7 @@
                     <a id="whatsapp-specialist-btn" 
                        href="javascript:void(0)"
                        class="btn-secondary"
-                       onclick="buildWhatsAppURL();">Fale com um Especialista</a>
+                       onclick="goToTransition();">Fale com um Especialista</a>
                 </div>
             </div>
         </section>
@@ -234,7 +233,7 @@
                     <a id="whatsapp-main-btn" 
                        href="javascript:void(0)"
                        class="btn-whatsapp"
-                       onclick="buildWhatsAppURL();">
+                       onclick="goToTransition();">
                         <i class="fab fa-whatsapp"></i>
                         Solicitar Orçamento via WhatsApp
                     </a>
@@ -351,6 +350,9 @@
         // ========================================== 
         // SCRIPT PARA INJETAR UTMs NO WHATSAPP
         // ========================================== 
+        // ========================================== 
+        // FUNÇÃO PARA REDIRECIONAR À PÁGINA DE TRANSIÇÃO
+        // ========================================== 
         function getUTMParameters() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -362,40 +364,24 @@
             };
         }
 
-        function buildWhatsAppURL() {
-            const phoneNumber = '5554992619111'; // Número sem máscara
-            const baseMessage = 'Olá! Gostaria de mais informações sobre câmaras frias.';
+        function goToTransition() {
             const utms = getUTMParameters();
+            let transitionUrl = 'obrigado.html';
+            const urlParams = new URLSearchParams();
             
-            // Construir mensagem com UTMs
-            let message = baseMessage;
-            if (utms.utm_source || utms.utm_medium || utms.utm_campaign) {
-                message += '\n\nOrigem da campanha:';
-                if (utms.utm_source) message += `\nFonte: ${utms.utm_source}`;
-                if (utms.utm_medium) message += `\nMeio: ${utms.utm_medium}`;
-                if (utms.utm_campaign) message += `\nCampanha: ${utms.utm_campaign}`;
-                if (utms.utm_content) message += `\nConteúdo: ${utms.utm_content}`;
-                if (utms.utm_term) message += `\nTermo: ${utms.utm_term}`;
+            // Preservar UTMs na URL de redirecionamento
+            if (utms.utm_source) urlParams.append('utm_source', utms.utm_source);
+            if (utms.utm_medium) urlParams.append('utm_medium', utms.utm_medium);
+            if (utms.utm_campaign) urlParams.append('utm_campaign', utms.utm_campaign);
+            if (utms.utm_content) urlParams.append('utm_content', utms.utm_content);
+            if (utms.utm_term) urlParams.append('utm_term', utms.utm_term);
+            
+            if (urlParams.toString()) {
+                transitionUrl += '?' + urlParams.toString();
             }
             
-            return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-        }
-
-        // Aplicar URL dinâmica aos botões WhatsApp
-        function initWhatsAppButtons() {
-            const whatsappButtons = document.querySelectorAll('[id*="whatsapp"]');
-            const whatsappUrl = buildWhatsAppURL();
-            
-            whatsappButtons.forEach(btn => {
-                btn.href = whatsappUrl;
-            });
-        }
-
-        // Executar quando o DOM estiver pronto
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initWhatsAppButtons);
-        } else {
-            initWhatsAppButtons();
+            // Redirecionar para página de transição
+            window.location.href = transitionUrl;
         }
     </script>
     <!-- ========================================== -->
