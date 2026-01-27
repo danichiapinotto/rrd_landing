@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectando ao WhatsApp...</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5FKGXKF8');</script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f7f6; margin: 0; }
+        .loader-container { text-align: center; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #25D366; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        h1 { font-size: 1.2rem; color: #333; }
+    </style>
+</head>
+<body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5FKGXKF8"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <div class="loader-container">
+        <div class="spinner"></div>
+        <h1>Conectando ao WhatsApp da RRD Câmaras Frias...</h1>
+        <p>Aguarde um instante.</p>
+    </div>
+
+    <script>
+        // Configuração do Redirecionamento
+        const whatsappUrl = "https://api.whatsapp.com/send?phone=554992619111&text=Olá! Gostaria de mais informações sobre câmaras frias.";
+        
+        // Aguarda 1.5 segundos para garantir o disparo da tag e redireciona
+        setTimeout(() => {
+            window.location.href = whatsappUrl;
+        }, 1500);
+    </script>
+</body>
+</html>
